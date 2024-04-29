@@ -1,5 +1,5 @@
   - name: mongodb
-    hosts: mongodb
+    hosts: local 
     become: yes
     tasks:
 
