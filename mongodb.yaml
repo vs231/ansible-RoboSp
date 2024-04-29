@@ -15,7 +15,7 @@
 
       - name: mongodb start
         ansible.buildin.service:
-          name: mongodb-org
+          name: mongod
           state: started
           enabled: yes
       - name: mongodb conf
@@ -25,6 +25,6 @@
           replace: '0.0.0.0'
       
       - name: mongodb restart
-        ansible.buildin.service
-          name: mongodb-org
+        ansible.buildin.service:
+          name: mongod
           state: restart
