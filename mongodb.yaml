@@ -4,9 +4,10 @@
     tasks:
 
       - name: mongodb
-        copy:
+        ansible.buildin.copy:
           src: mongodb.repo
           dest: /etc/yum.repos.d/mongodb.repo
+
       - name: mongodb install
         ansible.buildin.package:
           name: mongodb-org
