@@ -1,0 +1,32 @@
+  - name: catalogue
+    hosts: catalogue
+    become: yes
+    tasks:
+    - name: disable and install nodejs
+      ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
+
+    - name: install nodejs
+      ansible.builtin.dnf:
+        name: nodejs
+        state: present
+    
+    - name: useradd
+      ansible.builtin.user:
+        name: roboshop
+
+    - name: directory add
+      ansible.builtin.file:
+        path: /app
+        state: directory
+
+    - name: download zip filed
+      ansible.builtin.get_url:
+        url: curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+        dest: /tmp
+
+    - name: unziping the file
+      ansible.builtin.unarchive:
+        src: /tmp/catalogue.zip
+        dest: /app
+        remote_src: yes
+
