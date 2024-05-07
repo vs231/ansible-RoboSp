@@ -30,3 +30,18 @@
         dest: /app
         remote_src: yes
 
+    - name: daemon reload
+      ansible.builtin.systemd_service:
+      daemon_reload: yes
+
+    - name: start catalogue
+      ansible.builtin.service:
+        name: catalogue
+        state: started
+        enabled: yes
+    - name: mongodb
+      ansible.builtin.copy:
+        src: mongodn.repo
+        dest: /etc/yum.repos.d/mongodb.repo
+       
+
