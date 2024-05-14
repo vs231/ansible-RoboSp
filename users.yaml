@@ -1,0 +1,76 @@
+  - name: user
+    hosts: user
+    become: yes
+    tasks: 
+      - name: uninstall and update nodejs
+        ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
+
+      - name: install nodejs
+        ansible.builtin.dnf:
+          name: nodejs
+          state: present
+
+      - name: useradded
+        ansible.builtin.user:
+          name: roboshop
+
+      - name: remove directory
+        ansible.builtin.file:
+          path: /app
+          state: absent
+
+      - name: add directory
+        ansible.builtin.file:
+          path: /app
+          state: directory
+
+      - name: download the file
+        ansible.builtin.get_url:
+          url: https://roboshop-builds.s3.amazonaws.com/user.zip 
+      - name: unzip file
+        ansible.builtin.unarchive:
+          src: /tmp/user.zip
+          path: /app
+          remote_src: yes
+      - name: change directory
+        ansible.builtin.command: npm install
+        args:
+          chdir: /app
+
+      - name: coping the services
+        ansible.builtin.copy:
+          src: user.service
+          dest: /etc/systemd/system/user.service
+
+      - name: reload the system
+        ansible.builtin.systemd_service:
+          daemon_reload: true
+
+      - name: enabled and started the service
+        ansible.builtin.systemd_service:
+          stated: started
+          enabled: yes
+
+      - name: copy the mongodb
+        ansible.builtin.copy:
+         src: mongodb.repo
+         dest: /etc/mongod.conf
+
+      - name: install client mongodb
+        ansible.builtin.package:
+          name: mongodb-org-shell -y
+          state: latest
+
+      - name: for product count
+        ansible.builtin.command: mongo --host mongodb.vs-devops.online --quiet --eval 'db = db.getSiblingDB("user"); db.products.count()'
+        register: product_count
+
+      - name: connect to mongodb
+        ansible.builtin.command: mongo --host mongodb.vs-devops.online </app/schema/user.js
+        when: product_count.stdout == "0"
+
+      - name:  restart the user
+        ansible.builtin.service:
+          name: user
+          state: restarted
+          enabled: true
