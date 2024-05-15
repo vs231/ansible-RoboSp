@@ -62,15 +62,15 @@
           state: latest
 
       - name: for product count
-        ansible.builtin.command: mongo --host mongodb.vs-devops.online --quiet --eval 'db = db.getSiblingDB("user"); db.products.count()'
-        register: product_count
+        ansible.builtin.command: mongo --host mongodb.vs-devops.online --quiet --eval 'db = db.getSiblingDB("users"); db.users.count()'
+        register: user_count
 
       - name: connect to mongodb
         ansible.builtin.command: mongo --host mongodb.vs-devops.online </app/schema/user.js
-        when: product_count.stdout == "0"
+        when: user_count.stdout == "0"
 
       - name:  restart the user
-        ansible.builtin.service:
+        ansible.builtin.systemd_service:
           name: user
           state: restarted
           enabled: true
