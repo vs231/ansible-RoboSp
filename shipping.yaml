@@ -1,0 +1,71 @@
+  - name: install shipping module
+    hosts: shipping
+    become: yes
+    tasks:
+      - name: install maven
+        ansible.builtin.package:
+          name: maven
+          state: present
+
+      - name: add user
+        ansible.builtin.user:
+          name: roboshop
+
+      - name: remove directory
+        ansible.builtin.file:
+          name: /app
+          state: absent
+      - name: add directory
+        ansible.builtin.file:
+          name: /app
+          state: directory
+      
+      - name: download the code
+        ansible.builtin.get_url:
+          url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
+          dest: /tmp
+      
+      - name: unzip the code
+        ansible.builtin.unarchive:
+          src: /tmp/shipping.zip
+          dest: /app
+          remote_src: yes
+
+      - name: installing maven dependices
+        ansible.builtin.command: mvn clean package ; mv target/shipping-1.0.jar shipping.jar
+        args:
+          chdir: /app
+
+      - name: copy the configuration
+        ansible.builtin.copy:
+          src: shipping.service
+          dest: /etc/systemd/system/shipping.service
+      
+      - name: daemon reload
+        ansible.builtin.system_service:
+          daemon_reload: yes
+
+      - name: install mysql
+        ansible.builtin.package:
+          name: mysql
+          state: present
+
+      - name: installing client dependices
+        ansible.bulitin.command: mysql -h mysql.vs-devops.online -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'"
+        register: schema
+
+      - name: print output
+        ansible.builtin.debug:
+          msg: "schema output:{{schema}}"
+      
+      - name: load the cities
+        ansible.builtin.shell: mysql -h mysql.vs-devops.online -uroot -pRoboShop@1 < /app/schema/shipping.sql 
+
+      - name: restarted the server
+        ansible.builtin.service:
+          name: shipping
+          state: restarted
+          enabled: yes
+
+
+        
