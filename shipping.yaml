@@ -61,11 +61,12 @@
 
       - name: print output
         ansible.builtin.debug:
-          msg: "schema output:{{schema}}"
+          msg: "schema output: {{schema}}"
       
       - name: load the cities
         ansible.builtin.shell: mysql -h mysql.vs-devops.online -uroot -pRoboShop@1 < /app/schema/shipping.sql 
-
+        when: schema.stdout != "1"
+        
       - name: restarted the server
         ansible.builtin.service:
           name: shipping
