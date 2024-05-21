@@ -32,7 +32,8 @@
           remote_src: yes
 
       - name: installing maven dependices
-        ansible.builtin.command: mvn clean package ; mv target/shipping-1.0.jar shipping.jar
+        ansible.builtin.command: mvn clean package  
+        ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
         args:
           chdir: /app
 
