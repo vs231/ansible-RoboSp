@@ -1,4 +1,4 @@
-  - name: install shipping module
+  - name: shipping
     hosts: shipping
     become: yes
     tasks:
