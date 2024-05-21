@@ -6,3 +6,9 @@ catalogue.vs-devops.online
 redis.vs-devops.online
 [mysql]
 mysql.vs-devops.online
+[cart]
+cart.vs-devops.online
+[user]
+user.vs-devops.online
+[shipping]
+shipping.vs-devops.online
