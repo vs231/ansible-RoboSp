@@ -59,7 +59,7 @@
 
       - name: check cities schema exists or not
         ansible.builtin.command:  mysql -h mysql.vs-devops.online -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'"
-          mysql_password: Roboshop@1
+        mysql_password: Roboshop@1
         register: schema
 
       - name: print output
